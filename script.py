@@ -2,7 +2,7 @@ __version__ = "0.2.3"
 
 import pathlib
 import argparse
-import clipboard
+import pyperclip as clipboard
 import color
 from color import paint
 

@@ -1,0 +1,32 @@
+[project]
+name = "make"
+dynamic = ["version"]
+description = "Add your description here"
+authors = [
+    { name = "FloatingInt", email = "knutolaihelgesen@gmail.com" }
+]
+dependencies = [
+    "pyperclip>=1.8.2",
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.version]
+path="script.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "script.py",
+    "here.bat"
+]

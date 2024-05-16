@@ -12,7 +12,7 @@ class ParserArgs(argparse.Namespace):
 
 
 parser = argparse.ArgumentParser(
-    prog="Here",
+    prog="here",
     usage="Copy 'here' path to clipboard"
     )
 parser.add_argument("-v", "--version",

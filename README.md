@@ -1,3 +1,3 @@
-# make
+# Here command
 
-Describe your project here.
+Copies the current location to clipboard

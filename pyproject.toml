@@ -1,7 +1,7 @@
 [project]
 name = "make"
 dynamic = ["version"]
-description = "Add your description here"
+description = "Copies the current location to clipboard"
 authors = [
     { name = "FloatingInt", email = "knutolaihelgesen@gmail.com" }
 ]

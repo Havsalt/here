@@ -1,4 +1,4 @@
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 
 import pathlib
 import argparse
@@ -42,9 +42,38 @@ args = ParserArgs()
 parser.parse_args(namespace=args)
 
 if args.where_mode:
-    location = subprocess.check_output(["where", args.end], text=True)
+    if args.end == ".":
+        if not args.silent:
+            print(paint("[Error]", color.CRIMSON),
+                  paint("Cannot search for", color.GRAY),
+                  paint("'.'", color.WHITE)
+                  + paint(". Argument", color.GRAY),
+                  paint("end", color.WHITE),
+                  paint("required", color.GRAY))
+            print(paint("[Info]", color.SEA_GREEN),
+                  paint("Caused by flag", color.GRAY),
+                  paint("-w", color.WHITE)
+                  + paint("/", color.GRAY)
+                  + paint("--from-where", color.WHITE))
+        exit(1) # error code
+    result = subprocess.run(["where", args.end],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True)
+    if result.returncode != 0:
+        if not args.silent:
+            print(paint("[Error]", color.CRIMSON),
+                  paint("Cold not find", color.GRAY),
+                  paint(args.end, color.WHITE))
+            print(paint("[Info]", color.SEA_GREEN),
+                  paint("Caused by flag", color.GRAY),
+                  paint("-w", color.WHITE)
+                  + paint("/", color.GRAY)
+                  + paint("--from-where", color.WHITE))
+        exit(2)
+    location = result.stdout.rstrip("\n ")
     absolute_path = (
-        pathlib.Path(location.rstrip("\n "))
+        pathlib.Path(location)
         .resolve()
     )
 else:

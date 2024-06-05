@@ -1,4 +1,4 @@
-__version__ = "0.2.4"
+__version__ = "0.2.6"
 
 import pathlib
 import argparse
@@ -13,6 +13,7 @@ class ParserArgs(argparse.Namespace):
     verbose: bool
     end: str
     where_mode: bool
+    folder_mode: bool
 
 
 parser = argparse.ArgumentParser(
@@ -22,6 +23,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument("-v", "--version",
                     action="version",
                     version=f"%(prog)s: v{__version__}")
+parser.add_argument("-f", "--folder",
+                    action="store_true",
+                    dest="folder_mode")
 parser.add_argument("-w", "--from-where",
                     action="store_true",
                     dest="where_mode")
@@ -50,14 +54,17 @@ else:
         .joinpath(args.end)
         .resolve()
     )
+if args.folder_mode:
+    if absolute_path.is_file():
+        absolute_path = absolute_path.parent
 
 if not args.silent:
     if args.verbose:
-        print(paint("[Info]", color.AQUA),
-              paint("Copying to clipboard", color.PINK) + paint(":", color.WHITE),
-              paint(absolute_path, color.UNDERLINE + color.DARK_VIOLET))
+        print(paint("[Info]", color.SEA_GREEN),
+              paint("Copying to clipboard", color.GRAY) + paint(":", color.WHITE),
+              paint(absolute_path, color.UNDERLINE + color.SALMON))
     else:
-        print(absolute_path)
+        print(paint(absolute_path, color.SALMON))
 
 clipboard.copy(str(absolute_path))
 

@@ -8,7 +8,7 @@
 #   with-sources: false
 
 -e file:.
-actus==0.2.1
+actus==0.4.0
     # via make
 colex==0.1.0
     # via actus

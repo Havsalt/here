@@ -52,8 +52,8 @@ parser.parse_args(namespace=args)
 if args.where_mode:
     if args.end == ".":
         if not args.silent:
-            error("Cannot search for ['.']. Argument [end] required")
-            info("Casued by flag [-w]/[--from-where]")
+            error("Cannot search for $['.']. Argument $[end] required")
+            info("Casued by flag $[-w]/$[--from-where]")
         exit(1) # invalid search
     result = subprocess.run(["where", args.end],
                             stdout=subprocess.PIPE,
@@ -61,8 +61,8 @@ if args.where_mode:
                             text=True)
     if result.returncode != 0:
         if not args.silent:
-            error(f"Could not find [{args.end}]")
-            info("Caused by flag [-w]/[--from-where]")
+            error(f"Could not find $[{args.end}]")
+            info("Caused by flag $[-w]/$[--from-where]")
         exit(2) # seach unsuccessful
     location = result.stdout.rstrip("\n ")
     absolute_path = (
@@ -83,7 +83,7 @@ if args.folder_mode:
 if not args.silent:
     if args.verbose:
         colored_path = colex.colorize(str(absolute_path), colex.UNDERLINE + colex.SALMON)
-        info(f"Copying to clipboard[:] {colored_path}")
+        info(f"Copying to clipboard$[:] {colored_path}")
     else:
         print(colex.colorize(str(absolute_path), colex.SALMON))
 
@@ -92,10 +92,10 @@ clipboard.copy(str(absolute_path))
 if args.change_mode:
     if not absolute_path.is_dir():
         if not args.silent:
-            warn(f"[{absolute_path}] is not a [directory], and can therefore [not change]!")
+            warn(f"$[{absolute_path}] is not a $[directory], and can therefore $[not change]!")
         exit(3) # requires folder path to change
     if not args.silent:
         if args.verbose:
-            info(f"Preparing [cd {absolute_path}]...")
+            info(f"Preparing $[cd {absolute_path}]...")
     keyboard.write(f'cd "{absolute_path}"')
     keyboard.press_and_release("enter")

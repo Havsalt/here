@@ -1,11 +1,12 @@
-__version__ = "0.2.7"
+__version__ = "0.3.0"
 
 import pathlib
 import argparse
 import subprocess
 import pyperclip as clipboard
-import color
-from color import paint
+
+import colex
+from actus import info, error
 
 
 class ParserArgs(argparse.Namespace):
@@ -19,7 +20,7 @@ class ParserArgs(argparse.Namespace):
 parser = argparse.ArgumentParser(
     prog="here",
     usage="Copy 'here' path to clipboard"
-    )
+)
 parser.add_argument("-v", "--version",
                     action="version",
                     version=f"%(prog)s: v{__version__}")
@@ -41,36 +42,23 @@ parser.add_argument("end",
 args = ParserArgs()
 parser.parse_args(namespace=args)
 
+# TODO: handle select of multipath results
+
 if args.where_mode:
     if args.end == ".":
         if not args.silent:
-            print(paint("[Error]", color.CRIMSON),
-                  paint("Cannot search for", color.GRAY),
-                  paint("'.'", color.WHITE)
-                  + paint(". Argument", color.GRAY),
-                  paint("end", color.WHITE),
-                  paint("required", color.GRAY))
-            print(paint("[Info]", color.SEA_GREEN),
-                  paint("Caused by flag", color.GRAY),
-                  paint("-w", color.WHITE)
-                  + paint("/", color.GRAY)
-                  + paint("--from-where", color.WHITE))
-        exit(1) # error code
+            error("Cannot search for ['.']. Argument [end] required")
+            info("Casued by flag [-w]/[--from-where]")
+        exit(1) # invalid search
     result = subprocess.run(["where", args.end],
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             text=True)
     if result.returncode != 0:
         if not args.silent:
-            print(paint("[Error]", color.CRIMSON),
-                  paint("Cold not find", color.GRAY),
-                  paint(args.end, color.WHITE))
-            print(paint("[Info]", color.SEA_GREEN),
-                  paint("Caused by flag", color.GRAY),
-                  paint("-w", color.WHITE)
-                  + paint("/", color.GRAY)
-                  + paint("--from-where", color.WHITE))
-        exit(2)
+            error(f"Could not find [{args.end}]")
+            info("Caused by flag [-w]/[--from-where]")
+        exit(2) # seach unsuccessful
     location = result.stdout.rstrip("\n ")
     absolute_path = (
         pathlib.Path(location)
@@ -89,11 +77,9 @@ if args.folder_mode:
 
 if not args.silent:
     if args.verbose:
-        print(paint("[Info]", color.SEA_GREEN),
-              paint("Copying to clipboard", color.GRAY) + paint(":", color.WHITE),
-              paint(absolute_path, color.UNDERLINE + color.SALMON))
+        colored_path = colex.colorize(str(absolute_path), colex.UNDERLINE + colex.SALMON)
+        info(f"Copying to clipboard[:] {colored_path}")
     else:
-        print(paint(absolute_path, color.SALMON))
+        print(colex.colorize(str(absolute_path), colex.SALMON))
 
 clipboard.copy(str(absolute_path))
-

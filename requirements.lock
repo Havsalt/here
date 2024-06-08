@@ -13,5 +13,7 @@ actus==0.2.1
 colex==0.1.0
     # via actus
     # via make
+keyboard==0.13.5
+    # via make
 pyperclip==1.8.2
     # via make

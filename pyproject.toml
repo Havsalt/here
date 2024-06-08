@@ -6,9 +6,10 @@ authors = [
     { name = "FloatingInt", email = "knutolaihelgesen@gmail.com" }
 ]
 dependencies = [
-    "pyperclip>=1.8.2",
+    "pyperclip==1.8.2",
     "actus==0.2.1",
     "colex==0.1.0",
+    "keyboard==0.13.5",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"

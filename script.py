@@ -1,12 +1,13 @@
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 import pathlib
 import argparse
 import subprocess
 import pyperclip as clipboard
 
+import keyboard
 import colex
-from actus import info, error
+from actus import info, warn, error
 
 
 class ParserArgs(argparse.Namespace):
@@ -15,6 +16,7 @@ class ParserArgs(argparse.Namespace):
     end: str
     where_mode: bool
     folder_mode: bool
+    change_mode: bool
 
 
 parser = argparse.ArgumentParser(
@@ -30,6 +32,9 @@ parser.add_argument("-f", "--folder",
 parser.add_argument("-w", "--from-where",
                     action="store_true",
                     dest="where_mode")
+parser.add_argument("-d", "--change-directory",
+                    action="store_true",
+                    dest="change_mode")
 print_group = parser.add_mutually_exclusive_group()
 print_group.add_argument("--verbose",
                          action="store_true")
@@ -72,7 +77,7 @@ else:
         .resolve()
     )
 if args.folder_mode:
-    if absolute_path.is_file():
+    if absolute_path.is_file(): # remove file part
         absolute_path = absolute_path.parent
 
 if not args.silent:
@@ -83,3 +88,14 @@ if not args.silent:
         print(colex.colorize(str(absolute_path), colex.SALMON))
 
 clipboard.copy(str(absolute_path))
+
+if args.change_mode:
+    if not absolute_path.is_dir():
+        if not args.silent:
+            warn(f"[{absolute_path}] is not a [directory], and can therefore [not change]!")
+        exit(3) # requires folder path to change
+    if not args.silent:
+        if args.verbose:
+            info(f"Preparing [cd {absolute_path}]...")
+    keyboard.write(f'cd "{absolute_path}"')
+    keyboard.press_and_release("enter")

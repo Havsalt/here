@@ -1,10 +1,11 @@
-__version__ = "0.4.0"
+
+__version__ = "0.4.1"
 
 import pathlib
 import argparse
 import subprocess
-import pyperclip as clipboard
 
+import pyperclip as clipboard
 import keyboard
 import colex
 from actus import info, warn, error
@@ -18,6 +19,7 @@ class ParserArgs(argparse.Namespace):
     folder_mode: bool
     change_mode: bool
 
+# TODO: FIX normal mode (cwd problem)! `here some/path`
 
 parser = argparse.ArgumentParser(
     prog="here",

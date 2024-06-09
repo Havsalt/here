@@ -23,7 +23,7 @@ managed = true
 dev-dependencies = []
 
 [tool.hatch.version]
-path="script.py"
+path = "script.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -1,5 +1,5 @@
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 import pathlib
 import argparse
@@ -18,8 +18,8 @@ class ParserArgs(argparse.Namespace):
     where_mode: bool
     folder_mode: bool
     change_mode: bool
+    no_copy_mode: bool
 
-# TODO: FIX normal mode (cwd problem)! `here some/path`
 
 parser = argparse.ArgumentParser(
     prog="here",
@@ -37,6 +37,9 @@ parser.add_argument("-w", "--from-where",
 parser.add_argument("-d", "--change-directory",
                     action="store_true",
                     dest="change_mode")
+parser.add_argument("-n", "--no-copy",
+                    action="store_true",
+                    dest="no_copy_mode")
 print_group = parser.add_mutually_exclusive_group()
 print_group.add_argument("--verbose",
                          action="store_true")
@@ -54,8 +57,8 @@ parser.parse_args(namespace=args)
 if args.where_mode:
     if args.end == ".":
         if not args.silent:
-            error("Cannot search for $['.']. Argument $[end] required")
-            info("Casued by flag $[-w]/$[--from-where]")
+            error('Cannot search for $["."]. Argument $[end] required')
+            info("Caused by flag $[-w]/$[--from-where]")
         exit(1) # invalid search
     result = subprocess.run(["where", args.end],
                             stdout=subprocess.PIPE,
@@ -85,11 +88,17 @@ if args.folder_mode:
 if not args.silent:
     if args.verbose:
         colored_path = colex.colorize(str(absolute_path), colex.UNDERLINE + colex.SALMON)
-        info(f"Copying to clipboard$[:] {colored_path}")
+        if not args.no_copy_mode:
+            info(f"Copying to clipboard$[:] {colored_path}")
+        else:
+            info(f"Found$[:] {colored_path}")
     else:
         print(colex.colorize(str(absolute_path), colex.SALMON))
 
-clipboard.copy(str(absolute_path))
+if not args.no_copy_mode:
+    clipboard.copy(str(absolute_path))
+elif args.verbose:
+    info("Flag $[-n]/$[--no-copy] is present, $[ignoring copying to clipboard]")
 
 if args.change_mode:
     if not absolute_path.is_dir():

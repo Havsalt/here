@@ -6,14 +6,15 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
 
 -e file:.
 actus==0.4.0
-    # via make
+    # via here
 colex==0.1.0
     # via actus
-    # via make
+    # via here
 keyboard==0.13.5
-    # via make
+    # via here
 pyperclip==1.8.2
-    # via make
+    # via here

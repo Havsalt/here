@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 import pathlib
 import argparse
@@ -141,11 +141,15 @@ def main() -> int:
             if not args.no_color_mode
             else colex.NONE
         )
-        colored_path = colex.colorize(str(absolute_path), color)
+        path = (
+            colex.colorize(str(absolute_path), color)
+            if not args.no_color_mode
+            else absolute_path
+        )
         if not args.no_copy_mode:
-            info(f"Copying to clipboard$[:] {colored_path}")
+            info(f"Copying to clipboard$[:] {path}")
         else:
-            info(f"Found$[:] {colored_path}")
+            info(f"Found$[:] {path}")
     else:
         show_path(str(absolute_path))
 

@@ -9,9 +9,9 @@
 #   generate-hashes: false
 
 -e file:.
-actus==0.5.0
+actus==0.6.0
     # via here
-colex==0.1.0
+colex==0.2.0
     # via actus
     # via here
 keyboard==0.13.5

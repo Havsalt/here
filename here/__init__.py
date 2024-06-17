@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.6.1"
+__version__ = "0.7.0"
 
 import pathlib
 import argparse
@@ -20,14 +20,15 @@ from actus import info, warn, error, LogSection, Style
 
 
 class ParserArgs(argparse.Namespace):
-    silent: bool
-    verbose: bool
-    segment: str
     where_mode: bool
     folder_mode: bool
     change_mode: bool
+    escape_backslash: bool
     no_copy_mode: bool
     no_color_mode: bool
+    silent: bool
+    verbose: bool
+    segment: str
 
 
 show_path = LogSection(
@@ -70,6 +71,10 @@ def main() -> int:
                         action="store_true",
                         dest="change_mode",
                         help="Set current working directory to result (schedule)")
+    parser.add_argument("-e", "--escape-backslash",
+                        action="store_true",
+                        dest="escape_backslash",
+                        help="Escape backslashes (\\ -> \\\\)")
     parser.add_argument("-n", "--no-copy",
                         action="store_true",
                         dest="no_copy_mode",
@@ -92,8 +97,6 @@ def main() -> int:
     args = ParserArgs()
     parser.parse_args(namespace=args)
 
-    # TODO: handle select of multipath results in -w mode
-
     if args.no_color_mode:
         info.disable_color()
         warn.disable_color()
@@ -105,7 +108,10 @@ def main() -> int:
         warn.disable_output()
         error.disable_output()
         show_path.disable_output()
+    
+    # TODO: handle select of multipath results in -w mode
 
+    absolute_path: pathlib.Path # result of long if-else block
     if args.where_mode:
         if args.segment == ".":
             error('Cannot search for $["."]. Argument $[segment] required')
@@ -124,6 +130,8 @@ def main() -> int:
             pathlib.Path(location)
             .resolve()
         )
+        if args.verbose:
+            info(f'Search $["{args.segment}"] found $[{location}]')
     else:
         absolute_path = (
             pathlib.Path
@@ -131,6 +139,12 @@ def main() -> int:
             .joinpath(args.segment)
             .resolve()
         )
+    visual_path = (
+        str(absolute_path)
+        if not args.escape_backslash
+        else str(absolute_path).replace("\\", "\\\\")
+    )
+
     if args.folder_mode:
         if absolute_path.is_file(): # remove file part
             absolute_path = absolute_path.parent
@@ -142,19 +156,19 @@ def main() -> int:
             else colex.NONE
         )
         path = (
-            colex.colorize(str(absolute_path), color)
+            colex.colorize(visual_path, color)
             if not args.no_color_mode
-            else absolute_path
+            else visual_path
         )
         if not args.no_copy_mode:
             info(f"Copying to clipboard$[:] {path}")
         else:
             info(f"Found$[:] {path}")
     else:
-        show_path(str(absolute_path))
+        show_path(visual_path)
 
     if not args.no_copy_mode:
-        clipboard.copy(str(absolute_path))
+        clipboard.copy(visual_path)
     elif args.verbose:
         info("Flag $[-n]/$[--no-copy] is present, $[ignoring copying to clipboard]")
 

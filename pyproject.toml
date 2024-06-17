@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "pyperclip==1.8.2",
-    "actus~=0.4.0",
+    "actus~=0.5.0",
     "colex~=0.1.0",
     "keyboard==0.13.5",
 ]

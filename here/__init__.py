@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 import pathlib
 import argparse
@@ -139,15 +139,16 @@ def main() -> int:
             .joinpath(args.segment)
             .resolve()
         )
+
+    if args.folder_mode:
+        if absolute_path.is_file(): # remove file part
+            absolute_path = absolute_path.parent
+    
     visual_path = (
         str(absolute_path)
         if not args.escape_backslash
         else str(absolute_path).replace("\\", "\\\\")
     )
-
-    if args.folder_mode:
-        if absolute_path.is_file(): # remove file part
-            absolute_path = absolute_path.parent
 
     if args.verbose:
         color = (

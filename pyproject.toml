@@ -1,5 +1,5 @@
 [project]
-name = "make"
+name = "here"
 dynamic = ["version"]
 description = "Copies the current location to clipboard"
 authors = [

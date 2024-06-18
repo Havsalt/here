@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.7.1"
+__version__ = "0.8.0"
 
 import pathlib
 import argparse
@@ -51,49 +51,71 @@ def main() -> int:
         description="Copy 'here' path to clipboard",
         add_help=False
     )
-    parser.add_argument("-h", "--help",
-                        action="help",
-                        help="Show this help message and exit",
-                        default=argparse.SUPPRESS)
-    parser.add_argument("-v", "--version",
-                        action="version",
-                        version=f"%(prog)s: v{__version__}",
-                        help="Show `%(prog)s` version number and exit")
-    parser.add_argument("-f", "--folder",
-                        action="store_true",
-                        dest="folder_mode",
-                        help="Get folder component of result")
-    parser.add_argument("-w", "--from-where",
-                        action="store_true",
-                        dest="where_mode",
-                        help="Use `where` command to search")
-    parser.add_argument("-d", "--change-directory",
-                        action="store_true",
-                        dest="change_mode",
-                        help="Set current working directory to result (schedule)")
-    parser.add_argument("-e", "--escape-backslash",
-                        action="store_true",
-                        dest="escape_backslash",
-                        help="Escape backslashes (\\ -> \\\\)")
-    parser.add_argument("-n", "--no-copy",
-                        action="store_true",
-                        dest="no_copy_mode",
-                        help="Prevent copy to clipboard")
-    parser.add_argument("-c", "--no-color",
-                        action="store_true",
-                        dest="no_color_mode",
-                        help="Suppress color")
+    parser.add_argument(
+        "-h", "--help",
+        action="help",
+        help="Show this help message and exit",
+        default=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        "-v", "--version",
+        action="version",
+        version=f"%(prog)s: v{__version__}",
+        help="Show `%(prog)s` version number and exit"
+    )
+    parser.add_argument(
+        "-f", "--folder",
+        action="store_true",
+        dest="folder_mode",
+        help="Get folder component of result"
+    )
+    parser.add_argument(
+        "-w", "--from-where",
+        action="store_true",
+        dest="where_mode",
+        help="Use `where` command to search"
+    )
+    parser.add_argument(
+        "-d", "--change-directory",
+        action="store_true",
+        dest="change_mode",
+        help="Set current working directory to result (schedule)"
+    )
+    parser.add_argument(
+        "-e", "--escape-backslash",
+        action="store_true",
+        dest="escape_backslash",
+        help="Escape backslashes (\\ -> \\\\)"
+    )
+    parser.add_argument(
+        "-n", "--no-copy",
+        action="store_true",
+        dest="no_copy_mode",
+        help="Prevent copy to clipboard"
+    )
+    parser.add_argument(
+        "-c", "--no-color",
+        action="store_true",
+        dest="no_color_mode",
+        help="Suppress color"
+    )
     print_group = parser.add_mutually_exclusive_group()
-    print_group.add_argument("--verbose",
-                             action="store_true",
-                             help="Display more info during execution")
-    print_group.add_argument("--silent",
-                             action="store_true",
-                             help="Display less info during execution")
-    parser.add_argument("segment",
-                        nargs="?",
-                        default=".",
-                        help="Join with cwd, or use as search (with -w/--from-where)")
+    print_group.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Display more info during execution"
+    )
+    print_group.add_argument(
+        "--silent",
+        action="store_true",
+        help="Display less info during execution"
+    )
+    parser.add_argument(
+        "segment",
+        nargs="?",
+        default=".",
+        help="Join with cwd, or use as search (with -w/--from-where)"
+    )
     args = ParserArgs()
     parser.parse_args(namespace=args)
 

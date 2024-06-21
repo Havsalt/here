@@ -9,7 +9,7 @@
 #   generate-hashes: false
 
 -e file:.
-actus==0.6.3
+actus==0.7.1
     # via here
 colex==0.2.0
     # via actus

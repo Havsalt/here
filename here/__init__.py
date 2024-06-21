@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 import pathlib
 import argparse
@@ -24,6 +24,7 @@ class ParserArgs(argparse.Namespace):
     folder_mode: bool
     change_mode: bool
     escape_backslash: bool
+    wrap_quote: bool
     no_copy_mode: bool
     no_color_mode: bool
     silent: bool
@@ -79,13 +80,19 @@ def main() -> int:
         "-d", "--change-directory",
         action="store_true",
         dest="change_mode",
-        help="Set current working directory to result (schedule)"
+        help="Set current working directory to result (schedules writing)"
     )
     parser.add_argument(
         "-e", "--escape-backslash",
         action="store_true",
         dest="escape_backslash",
         help="Escape backslashes (\\ -> \\\\)"
+    )
+    parser.add_argument(
+        "-q", "--wrap-quote",
+        action="store_true",
+        dest="wrap_quote",
+        help="Wrap result in double quotes"
     )
     parser.add_argument(
         "-n", "--no-copy",
@@ -137,15 +144,17 @@ def main() -> int:
     if args.where_mode:
         if args.segment == ".":
             error('Cannot search for $["."]. Argument $[segment] required')
-            info("Caused by flag $[-w]/$[--from-where]")
+            if args.verbose:
+                info("Caused by flag $[-w]/$[--from-where]")
             return 1 # invalid search
         result = subprocess.run(["where", args.segment],
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 text=True)
         if result.returncode != 0:
-            error(f"Could not find $[{args.segment}]")
-            info("Caused by flag $[-w]/$[--from-where]")
+            error(f'Could not find $["{args.segment}"]')
+            if args.verbose:
+                info("Caused by flag $[-w]/$[--from-where]")
             return 2 # search unsuccessful
         location = result.stdout.rstrip("\n ")
         absolute_path = (
@@ -163,14 +172,29 @@ def main() -> int:
         )
 
     if args.folder_mode:
-        if absolute_path.is_file(): # remove file part
+        if args.verbose and not absolute_path.exists():
+            with warn(f"Path $[{absolute_path}] does not exist"):
+                warn("Failed $[.exists()] check")
+        info("Flag $[-f]/$[--folder] is present, collecting folder component")
+        info.indent()
+        if not absolute_path.is_dir(): # remove file part if invalid dir
+            if args.verbose:
+                with info(f"Path $[{absolute_path}] is $[not a folder]"):
+                    info("Failed $[.is_dir()] check")
+                info(f'Removed $["{absolute_path.stem}"] component at end').dedent()
             absolute_path = absolute_path.parent
+        
+        elif args.verbose:
+            info("Path pointed to folder...")
     
     visual_path = (
         str(absolute_path)
         if not args.escape_backslash
         else str(absolute_path).replace("\\", "\\\\")
     )
+
+    if args.wrap_quote:
+        visual_path = f'"{visual_path}"'
 
     if args.verbose:
         color = (

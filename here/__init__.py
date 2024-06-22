@@ -7,11 +7,12 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
-import pathlib
-import argparse
 import subprocess
+import argparse
+import pathlib
+import os
 
 import pyperclip as clipboard
 import keyboard
@@ -19,7 +20,7 @@ import colex
 from actus import info, warn, error, LogSection, Style
 
 
-class ParserArgs(argparse.Namespace):
+class ParserArguments(argparse.Namespace):
     where_mode: bool
     folder_mode: bool
     change_mode: bool
@@ -27,6 +28,7 @@ class ParserArgs(argparse.Namespace):
     wrap_quote: bool
     no_copy_mode: bool
     no_color_mode: bool
+    posix_path: bool
     silent: bool
     verbose: bool
     segment: str
@@ -106,6 +108,13 @@ def main() -> int:
         dest="no_color_mode",
         help="Suppress color"
     )
+    parser.add_argument(
+        "--posix",
+        action=argparse.BooleanOptionalAction,
+        dest="posix_path",
+        default=(os.name == "posix"),
+        help="Use posix style path"
+    )
     print_group = parser.add_mutually_exclusive_group()
     print_group.add_argument(
         "--verbose",
@@ -123,7 +132,7 @@ def main() -> int:
         default=".",
         help="Join with cwd, or use as search (with -w/--from-where)"
     )
-    args = ParserArgs()
+    args = ParserArguments()
     parser.parse_args(namespace=args)
 
     if args.no_color_mode:
@@ -175,8 +184,9 @@ def main() -> int:
         if args.verbose and not absolute_path.exists():
             with warn(f"Path $[{absolute_path}] does not exist"):
                 warn("Failed $[.exists()] check")
-        info("Flag $[-f]/$[--folder] is present, collecting folder component")
-        info.indent()
+        if args.verbose:
+            info("Flag $[-f]/$[--folder] is present, collecting folder component")
+            info.indent()
         if not absolute_path.is_dir(): # remove file part if invalid dir
             if args.verbose:
                 with info(f"Path $[{absolute_path}] is $[not a folder]"):
@@ -185,13 +195,16 @@ def main() -> int:
             absolute_path = absolute_path.parent
         
         elif args.verbose:
-            info("Path pointed to folder...")
+            info("Path is $[already a folder], skipping...")
     
     visual_path = (
-        str(absolute_path)
-        if not args.escape_backslash
-        else str(absolute_path).replace("\\", "\\\\")
+        absolute_path.as_posix()
+        if args.posix_path
+        else str(absolute_path)
     )
+
+    if args.escape_backslash:
+        visual_path = visual_path.replace("\\", "\\\\")
 
     if args.wrap_quote:
         visual_path = f'"{visual_path}"'

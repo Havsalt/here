@@ -3,7 +3,7 @@ name = "here"
 dynamic = ["version"]
 description = "Copies the current location to clipboard"
 authors = [
-    { name = "FloatingInt", email = "knutolaihelgesen@gmail.com" }
+    { name = "Havsalt", email = "knutolaihelgesen@gmail.com" }
 ]
 dependencies = [
     "pyperclip==1.8.2",

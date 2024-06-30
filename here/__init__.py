@@ -215,15 +215,15 @@ def main() -> int:
             if not args.no_color_mode
             else colex.NONE
         )
-        path = (
+        colored_path = (
             colex.colorize(visual_path, color)
             if not args.no_color_mode
             else visual_path
         )
         if not args.no_copy_mode:
-            info(f"Copying to clipboard$[:] {path}")
+            info(f"Copying to clipboard$[:] {colored_path}")
         else:
-            info(f"Found$[:] {path}")
+            info(f"Found$[:] {colored_path}")
     else:
         show_path(visual_path)
 

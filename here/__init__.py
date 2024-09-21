@@ -16,6 +16,7 @@ import os
 
 import pyperclip as clipboard
 import keyboard
+import survey
 import colex
 from actus import info, warn, error, LogSection, Style
 
@@ -130,6 +131,7 @@ def main() -> int:
         "segment",
         nargs="?",
         default=".",
+        metavar="appended segment / search word",
         help="Join with cwd, or use as search (with -w/--from-where)"
     )
     args = ParserArguments()
@@ -165,7 +167,18 @@ def main() -> int:
             if args.verbose:
                 info("Caused by flag $[-w]/$[--from-where]")
             return 2 # search unsuccessful
-        location = result.stdout.rstrip("\n ")
+        # parse result
+        raw_result = result.stdout.rstrip("\n ")
+        if "\n" in raw_result: # is multi-result
+            options = raw_result.split("\n")
+            index: int = survey.routines.select(  # type: ignore
+                ":",
+                options=options
+            )
+            final_result = options[index]
+        else:
+            final_result = raw_result
+        location = final_result
         absolute_path = (
             pathlib.Path(location)
             .resolve()

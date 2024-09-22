@@ -7,7 +7,7 @@ Copy 'here' path to clipboard
 
 from __future__ import annotations
 
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 
 import subprocess
 import argparse
@@ -32,7 +32,7 @@ class ParserArguments(argparse.Namespace):
     posix_path: bool
     silent: bool
     verbose: bool
-    segment: str
+    segment_or_name: str
 
 
 show_path = LogSection(
@@ -128,10 +128,10 @@ def main() -> int:
         help="Display less info during execution"
     )
     parser.add_argument(
-        "segment",
+        "segment_or_name",
         nargs="?",
         default=".",
-        metavar="appended segment / search word",
+        metavar="append segment / search name",
         help="Join with cwd, or use as search (with -w/--from-where)"
     )
     args = ParserArguments()
@@ -153,17 +153,17 @@ def main() -> int:
 
     absolute_path: pathlib.Path # result of long if-else block
     if args.where_mode:
-        if args.segment == ".":
-            error('Cannot search for $["."]. Argument $[segment] required')
+        if args.segment_or_name == ".":
+            error('Cannot search for $["."]. Argument $[search name] required')
             if args.verbose:
                 info("Caused by flag $[-w]/$[--from-where]")
             return 1 # invalid search
-        result = subprocess.run(["where", args.segment],
+        result = subprocess.run(["where", args.segment_or_name],
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 text=True)
         if result.returncode != 0:
-            error(f'Could not find $["{args.segment}"]')
+            error(f'Could not find $["{args.segment_or_name}"]')
             if args.verbose:
                 info("Caused by flag $[-w]/$[--from-where]")
             return 2 # search unsuccessful
@@ -184,12 +184,12 @@ def main() -> int:
             .resolve()
         )
         if args.verbose:
-            info(f'Search $["{args.segment}"] found $[{location}]')
+            info(f'Search $["{args.segment_or_name}"] found $[{location}]')
     else:
         absolute_path = (
             pathlib.Path
             .cwd()
-            .joinpath(args.segment)
+            .joinpath(args.segment_or_name)
             .resolve()
         )
 
